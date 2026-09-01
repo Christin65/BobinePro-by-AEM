@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BobinagePro™ - Suite Électromécanique & Atelier de Rebobinage</title>
+  <meta name="description" content="Application complète pour artisans bobiniers et électromécaniciens : relevé technique, schéma de bobinage, calcul de cuivre et devis de réparation en Ariary (Madagascar).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header principal avec identité atelier -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="16" cy="16" r="13" stroke="currentColor" opacity="0.3" stroke-dasharray="2 3"/>
+          <path d="M7 16 C7 9, 25 9, 25 16 C25 23, 7 23, 7 16 Z" stroke="#38BDF8"/>
+          <path d="M16 7 C23 7, 23 25, 16 25 C9 25, 9 7, 16 7 Z" stroke="#F59E0B"/>
+          <circle cx="16" cy="16" r="3" fill="#38BDF8"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title"><span id="header-workshop-name">Atelier de Bobinage</span> • <span class="brand-highlight">BobinagePro™</span></h1>
+        <p class="brand-subtitle" id="header-workshop-contact">Madagascar • Électromécanique & Rebobinage Moteurs</p>
+      </div>
+    </div>
+
+    <!-- Actions d'en-tête -->
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btn-open-workshop-modal" title="Configurer les coordonnées de votre atelier">
+        <span>🏢 Mon Atelier</span>
+      </button>
+
+      <button class="btn btn-secondary" id="btn-example-load" title="Charger un exemple d'atelier (Moteur 5.5kW 36 encoches)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Exemple d'atelier</span>
+      </button>
+
+      <button class="btn btn-primary" id="btn-print-fiche" title="Imprimer la Fiche d'Atelier & Devis avec Schéma">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        <span>🖨️ Imprimer Fiche & Devis A4</span>
+      </button>
+
+      <button class="btn-icon" id="btn-toggle-theme" title="Basculer Mode Clair / Sombre">
+        <span class="theme-icon-dark">🌙</span>
+        <span class="theme-icon-light">☀️</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Modale Configuration Atelier (Popup) -->
+  <dialog id="modal-workshop" class="modal-dialog">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h2 class="card-title">🏢 Identité de votre Atelier de Bobinage</h2>
+        <button type="button" class="btn-icon btn-sm" id="btn-close-workshop-modal">✕</button>
+      </div>
+      <p class="card-hint" style="margin-bottom:1rem;">Ces informations apparaîtront sur l'en-tête de toutes vos fiches d'atelier et factures/devis imprimés.</p>
+      
+      <form id="form-workshop-profile">
+        <div class="form-group">
+          <label for="ws-name">Nom de l'Atelier / Entreprise :</label>
+          <input type="text" id="ws-name" class="form-input" value="Atelier Électromécanique Moderne (AEM)">
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="ws-manager">Nom du Responsable / Maître Bobinier :</label>
+            <input type="text" id="ws-manager" class="form-input" value="BOTRATOMBO Christin">
+          </div>
+          <div class="form-group">
+            <label for="ws-phone">Téléphone / WhatsApp :</label>
+            <input type="text" id="ws-phone" class="form-input" value="034 28 705 40 / 032 59 213 28">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="ws-city">Ville / Localité (Madagascar) :</label>
+            <input type="text" id="ws-city" class="form-input" value="Ambatotokana Andrainjato Centre, Fianarantsoa (301), Madagascar">
+          </div>
+          <div class="form-group">
+            <label for="ws-nif">NIF / STAT ou Réf. Atelier :</label>
+            <input type="text" id="ws-nif" class="form-input" value="Réf: ATELIER-BOB-01">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="ws-email">Adresse Mail :</label>
+            <input type="email" id="ws-email" class="form-input" value="botratombo@yahoo.fr">
+          </div>
+          <div class="form-group">
+            <label for="ws-whatsapp">WhatsApp :</label>
+            <input type="text" id="ws-whatsapp" class="form-input" value="034 28 705 40">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="ws-currency">Devise / Monnaie locale :</label>
+            <input type="text" id="ws-currency" class="form-input" value="Ar" placeholder="ex: Ar, €, $, CFA">
+          </div>
+          <div class="form-group">
+            <label for="ws-tax">TVA (%) (Optionnel) :</label>
+            <input type="number" id="ws-tax" class="form-input" value="0" min="0" max="100">
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top:1.2rem; display:flex; justify-content:flex-end; gap:0.5rem;">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-workshop">Annuler</button>
+          <button type="submit" class="btn btn-primary">💾 Enregistrer Mon Atelier</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Navigation par Onglets -->
+  <nav class="app-tabs-nav" aria-label="Navigation des modules">
+    <button class="tab-btn active" data-tab="tab-schema">
+      <span class="tab-icon">🌀</span>
+      <span>Schéma de Bobinage</span>
+      <span class="badge-tag">Interactif</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-releve">
+      <span class="tab-icon">📋</span>
+      <span>Fiche & Devis en Ariary</span>
+      <span class="badge-tag tag-mga">Ar</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-matieres">
+      <span class="tab-icon">📦</span>
+      <span>Matières & Consommables</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-fils">
+      <span class="tab-icon">⚖️</span>
+      <span>Équivalence & Jauges Fils</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-adaptation">
+      <span class="tab-icon">⚡</span>
+      <span>Adaptation & Tension</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-transfo">
+      <span class="tab-icon">🔌</span>
+      <span>Transformateurs</span>
+    </button>
+  </nav>
+
+  <!-- Contenu Principal -->
+  <main class="app-main-content">
+    
+    <!-- ================================================================= -->
+    <!-- ONGLET 1 : GÉNÉRATEUR DE SCHÉMA DE BOBINAGE                      -->
+    <!-- ================================================================= -->
+    <section id="tab-schema" class="tab-panel active">
+      <div class="panel-grid-layout">
+        <!-- Colonne Paramètres du Schéma -->
+        <aside class="schema-control-sidebar card">
+          <div class="card-header">
+            <h2 class="card-title">⚙️ Paramètres du Stator</h2>
+            <span class="card-hint">Configuration géométrique</span>
+          </div>
+
+          <form id="schema-config-form" class="form-compact">
+            <!-- Nombre d'encoches Z -->
+            <div class="form-group">
+              <label for="cfg-slots">Nombre d'encoches ($Z$) :</label>
+              <div class="input-with-select">
+                <input type="number" id="cfg-slots" min="6" max="72" step="2" value="36" class="form-input">
+                <select id="cfg-slots-preset" class="form-select">
+                  <option value="">Préréglages...</option>
+                  <option value="12">12 encoches</option>
+                  <option value="18">18 encoches</option>
+                  <option value="24">24 encoches</option>
+                  <option value="36" selected>36 encoches (Courant)</option>
+                  <option value="48">48 encoches</option>
+                  <option value="54">54 encoches</option>
+                  <option value="72">72 encoches</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Nombre de pôles 2p -->
+            <div class="form-group">
+              <label for="cfg-poles">Nombre de pôles ($2p$) / Vitesse :</label>
+              <select id="cfg-poles" class="form-select">
+                <option value="2">2 pôles (3000 tr/min @ 50Hz)</option>
+                <option value="4" selected>4 pôles (1500 tr/min @ 50Hz)</option>
+                <option value="6">6 pôles (1000 tr/min @ 50Hz)</option>
+                <option value="8">8 pôles (750 tr/min @ 50Hz)</option>
+              </select>
+            </div>
+
+            <!-- Phases m -->
+            <div class="form-group">
+              <label for="cfg-phases">Type d'alimentation :</label>
+              <select id="cfg-phases" class="form-select">
+                <option value="3" selected>Triphasé (3 phases : U, V, W)</option>
+                <option value="1">Monophasé (Principal + Auxiliaire)</option>
+              </select>
+            </div>
+
+            <!-- Type de bobinage -->
+            <div class="form-group">
+              <label for="cfg-winding-type">Type de disposition :</label>
+              <select id="cfg-winding-type" class="form-select">
+                <option value="imbrique-1" selected>Imbriqué 1 couche (Pas constant)</option>
+                <option value="imbrique-2">Imbriqué 2 couches (Pas raccourci)</option>
+                <option value="concentrique">Concentrique (Bobines étagées)</option>
+              </select>
+            </div>
+
+            <!-- Pas de bobinage (pour imbriqué) -->
+            <div class="form-group" id="group-pas-custom">
+              <label for="cfg-pitch">Pas de bobinage ($y$) :</label>
+              <div class="input-hint-row">
+                <input type="text" id="cfg-pitch" value="1-8" class="form-input" placeholder="ex: 1-8 ou 1-7">
+                <span class="badge" id="badge-pas-theorique">Pas polaire = 9</span>
+              </div>
+              <small class="form-help">Encoche de départ $\to$ Encoche d'arrivée</small>
+            </div>
+
+            <!-- Raccordement des groupes -->
+            <div class="form-group">
+              <label for="cfg-connection">Connexion interne des pôles :</label>
+              <select id="cfg-connection" class="form-select">
+                <option value="serie" selected>Pôles alternés (Série classique)</option>
+                <option value="consequent">Pôles conséquents</option>
+                <option value="parallele">2 Voies parallèles ($2\Delta$ ou $2\text{Y}$)</option>
+              </select>
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- Filtre d'affichage des phases -->
+            <div class="form-group">
+              <label>Isoler une phase :</label>
+              <div class="phase-selector-pills">
+                <button type="button" class="phase-pill active" data-phase="all">Toutes</button>
+                <button type="button" class="phase-pill pill-u" data-phase="U">Phase U (Rouge)</button>
+                <button type="button" class="phase-pill pill-v" data-phase="V">Phase V (Vert)</button>
+                <button type="button" class="phase-pill pill-w" data-phase="W">Phase W (Bleu)</button>
+              </div>
+            </div>
+
+            <!-- Vue développée ou circulaire -->
+            <div class="form-group">
+              <label>Type de Vue :</label>
+              <div class="radio-group-horizontal">
+                <label class="radio-label">
+                  <input type="radio" name="view-mode" value="linear" checked>
+                  <span>Vue Développée (Étalée)</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="view-mode" value="circular">
+                  <span>Frontal Circulaire</span>
+                </label>
+              </div>
+            </div>
+
+            <button type="button" id="btn-recalculate-schema" class="btn btn-primary btn-block">
+              🔄 Actualiser le Schéma
+            </button>
+          </form>
+
+          <!-- Récapitulatif calculé des indices -->
+          <div class="summary-box">
+            <h4 class="summary-title">📊 Caractéristiques Déduites</h4>
+            <ul class="stats-list">
+              <li><span>Encoches/pôle/phase ($q$) :</span> <strong id="stat-q">3</strong></li>
+              <li><span>Pas polaire ($\tau_p$) :</span> <strong id="stat-tau-p">9 encoches</strong></li>
+              <li><span>Angle électrique ($\alpha_e$) :</span> <strong id="stat-alpha">20.0°</strong></li>
+              <li><span>Décalage inter-phases :</span> <strong id="stat-phase-shift">6 encoches ($120^\circ$)</strong></li>
+              <li><span>Groupes de bobines :</span> <strong id="stat-groups">12 groupes</strong></li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Zone de Dessin du Schéma SVG -->
+        <div class="schema-canvas-wrapper card">
+          <div class="schema-toolbar">
+            <div class="schema-legend">
+              <span class="legend-item"><span class="color-dot dot-u"></span> <strong>Phase U</strong> (Entrée: U1 / Sortie: U2)</span>
+              <span class="legend-item"><span class="color-dot dot-v"></span> <strong>Phase V</strong> (Entrée: V1 / Sortie: V2)</span>
+              <span class="legend-item"><span class="color-dot dot-w"></span> <strong>Phase W</strong> (Entrée: W1 / Sortie: W2)</span>
+              <span class="legend-item"><span class="color-dot dot-neutral"></span> Encoches Statoriques</span>
+            </div>
+
+            <div class="schema-actions-zoom">
+              <button class="btn-icon btn-sm" id="btn-zoom-in" title="Zoom avant">➕</button>
+              <button class="btn-icon btn-sm" id="btn-zoom-out" title="Zoom arrière">➖</button>
+              <button class="btn-icon btn-sm" id="btn-zoom-reset" title="Réinitialiser la vue">⟲</button>
+              <button class="btn btn-secondary btn-sm" id="btn-download-svg" title="Télécharger en image vectorielle SVG">
+                💾 Exporter SVG
+              </button>
+            </div>
+          </div>
+
+          <!-- Conteneur SVG avec défilement et zoom fluide -->
+          <div class="svg-viewport" id="svg-viewport">
+            <svg id="winding-svg" viewBox="0 0 1600 700" preserveAspectRatio="xMidYMid meet">
+              <!-- Rendu dynamique JS -->
+            </svg>
+          </div>
+
+          <!-- Guide d'insertion atelier -->
+          <div class="winding-step-guide">
+            <h3 class="guide-title">🛠️ Guide d'Insertion & Repérage à l'Établi</h3>
+            <div class="guide-cards-grid" id="guide-steps-container">
+              <!-- Rempli par JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- ONGLET 2 : FICHE DE RELEVÉ & DEVIS EN ARIARY (MADAGASCAR)         -->
+    <!-- ================================================================= -->
+    <section id="tab-releve" class="tab-panel">
+      <div class="job-sheet-container card">
+        <div class="job-sheet-header">
+          <div class="sheet-title-area">
+            <span class="sheet-badge">FICHE ATELIER N° <span id="display-job-id">JOB-2026-0816-01</span></span>
+            <h2>Fiche de Relevé & Devis de Réparation</h2>
+            <p class="sheet-desc">Relevé technique complet du moteur + Chiffrage des frais de réparation en Ariary (MGA).</p>
+          </div>
+          <div class="sheet-actions">
+            <button class="btn btn-secondary" id="btn-save-job">💾 Enregistrer la Fiche</button>
+            <button class="btn btn-secondary" id="btn-new-job">📄 Nouvelle Fiche</button>
+          </div>
+        </div>
+
+        <form id="form-job-sheet" class="job-sheet-form">
+          <!-- Section 1 : Identification Machine & Client -->
+          <fieldset class="form-section">
+            <legend class="section-legend">1. Identification Machine & Client</legend>
+            <div class="form-row-4">
+              <div class="form-group">
+                <label for="job-client">Nom du Client / Entreprise :</label>
+                <input type="text" id="job-client" class="form-input" value="Société Industrielle d'Antananarivo">
+              </div>
+              <div class="form-group">
+                <label for="job-brand">Marque / Fabricant :</label>
+                <input type="text" id="job-brand" class="form-input" value="Leroy-Somer">
+              </div>
+              <div class="form-group">
+                <label for="job-model">Type / Modèle :</label>
+                <input type="text" id="job-model" class="form-input" value="FLS 132 M">
+              </div>
+              <div class="form-group">
+                <label for="job-serial">N° de Série / Référence :</label>
+                <input type="text" id="job-serial" class="form-input" value="LS-789456-2024">
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Section 2 : Données de la Plaque Signalétique -->
+          <fieldset class="form-section">
+            <legend class="section-legend">2. Données Plaque Signalétique</legend>
+            <div class="form-row-5">
+              <div class="form-group">
+                <label for="job-power">Puissance ($P_n$) :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-power" class="form-input" value="5.5" step="0.1">
+                  <span class="unit-text">kW</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-voltage">Tension ($U$) :</label>
+                <div class="input-unit">
+                  <input type="text" id="job-voltage" class="form-input" value="230 / 400">
+                  <span class="unit-text">V</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-current">Courant ($I_n$) :</label>
+                <div class="input-unit">
+                  <input type="text" id="job-current" class="form-input" value="19.2 / 11.1">
+                  <span class="unit-text">A</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-speed">Vitesse ($N$) :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-speed" class="form-input" value="1450">
+                  <span class="unit-text">tr/min</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-freq">Fréquence ($f$) & Cos $\varphi$ :</label>
+                <div class="input-dual">
+                  <input type="number" id="job-freq" class="form-input" value="50" style="width: 50%;">
+                  <input type="number" id="job-cosphi" class="form-input" value="0.84" step="0.01" style="width: 50%;">
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Section 3 : Relevé Géométrique de la Carcasse (Stator nu) -->
+          <fieldset class="form-section">
+            <legend class="section-legend">3. Dimensions Carcasse & Paquet de Tôles (mm)</legend>
+            <div class="form-row-5">
+              <div class="form-group">
+                <label for="job-stator-d">Diamètre alésage ($D$) :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-stator-d" class="form-input" value="130" step="1">
+                  <span class="unit-text">mm</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-stator-l">Longueur paquet ($L$) :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-stator-l" class="form-input" value="140" step="1">
+                  <span class="unit-text">mm</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-stator-z">Nombre d'encoches ($Z$) :</label>
+                <input type="number" id="job-stator-z" class="form-input" value="36">
+              </div>
+              <div class="form-group">
+                <label for="job-slot-h">Hauteur encoche ($h_e$) :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-slot-h" class="form-input" value="22" step="0.5">
+                  <span class="unit-text">mm</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-slot-w">Largeur moyenne ($l_e$) :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-slot-w" class="form-input" value="8.5" step="0.1">
+                  <span class="unit-text">mm</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Section 4 : Relevé de l'Ancien Bobinage -->
+          <fieldset class="form-section highlight-fieldset">
+            <legend class="section-legend">4. Relevé Ancien Bobinage (À reproduire fidèlement)</legend>
+            <div class="form-row-4">
+              <div class="form-group">
+                <label for="job-turns-slot">Nombre de spires / encoche :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-turns-slot" class="form-input" value="32" step="1">
+                  <span class="unit-text">spires</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-wire-diam">Diamètre du fil d'origine :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-wire-diam" class="form-input" value="1.00" step="0.01">
+                  <span class="unit-text">mm</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="job-parallel-wires">Nombre de brins en parallèle :</label>
+                <input type="number" id="job-parallel-wires" class="form-input" value="1" min="1" max="8">
+              </div>
+              <div class="form-group">
+                <label for="job-measured-weight">Poids cuivre brûlé extrait :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-measured-weight" class="form-input" value="4.8" step="0.1">
+                  <span class="unit-text">kg</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row-3" style="margin-top: 1rem;">
+              <div class="form-group">
+                <label for="job-pitch-notes">Pas de bobinage relevé :</label>
+                <input type="text" id="job-pitch-notes" class="form-input" value="1-8 (Imbriqué pas raccourci)">
+              </div>
+              <div class="form-group">
+                <label for="job-coupling-orig">Couplage d'origine :</label>
+                <select id="job-coupling-orig" class="form-select">
+                  <option value="triangle-etoile" selected>Triangle (230V) / Étoile (400V)</option>
+                  <option value="etoile-seule">Étoile seule (400V)</option>
+                  <option value="triangle-seul">Triangle seul (400V)</option>
+                  <option value="dahlander">Dahlander (2 vitesses)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="job-chignon-len">Longueur débordement chignon :</label>
+                <div class="input-unit">
+                  <input type="number" id="job-chignon-len" class="form-input" value="45" step="1">
+                  <span class="unit-text">mm</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label for="job-observations">Constats de panne & Diagnostic d'atelier :</label>
+              <textarea id="job-observations" class="form-textarea" rows="2" placeholder="Ex: Bobinage noirci sur phase V suite à manque de phase. Prévoir remplacement des 2 roulements et vernissage Classe H."></textarea>
+            </div>
+          </fieldset>
+
+          <!-- Section 5 : CHIFFRAGE & DEVIS DE RÉPARATION EN ARIARY (NOUVEAU) -->
+          <fieldset class="form-section billing-fieldset">
+            <legend class="section-legend">💰 5. Devis & Frais de Réparation (en Ariary - Ar)</legend>
+            <p class="card-hint" style="margin-bottom: 1rem;">Calcul automatique des coûts basé sur le poids de cuivre calculé, les consommables et votre main d'œuvre.</p>
+            
+            <div class="billing-grid">
+              <!-- Colonne Saisie des tarifs -->
+              <div class="billing-inputs-col">
+                <div class="form-group">
+                  <label for="cost-copper-per-kg">Prix du Cuivre Émaillé / kg (Ariary) :</label>
+                  <div class="input-unit">
+                    <input type="number" id="cost-copper-per-kg" class="form-input" value="95000" step="1000">
+                    <span class="unit-text">Ar / kg</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="cost-consumables">Isolants (DMD/Nomex), Cales, Vernis, Gaines :</label>
+                  <div class="input-unit">
+                    <input type="number" id="cost-consumables" class="form-input" value="45000" step="1000">
+                    <span class="unit-text">Ar</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="cost-bearings">Roulements / Pièces mécaniques (optionnel) :</label>
+                  <div class="input-unit">
+                    <input type="number" id="cost-bearings" class="form-input" value="60000" step="1000">
+                    <span class="unit-text">Ar</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="cost-labor">Main d'œuvre de Rebobinage & Essais :</label>
+                  <div class="input-unit">
+                    <input type="number" id="cost-labor" class="form-input" value="250000" step="5000">
+                    <span class="unit-text">Ar</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="cost-advance">Acompte versé par le client :</label>
+                  <div class="input-unit">
+                    <input type="number" id="cost-advance" class="form-input" value="150000" step="5000">
+                    <span class="unit-text">Ar</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Colonne Récapitulatif Devis / Facture -->
+              <div class="billing-summary-col">
+                <div class="invoice-summary-card">
+                  <h3 class="summary-invoice-title">RÉCAPITULATIF DEVIS / FACTURE</h3>
+                  
+                  <div class="invoice-line">
+                    <span>Fil Cuivre Émaillé (<strong id="inv-copper-weight">5.12 kg</strong>) :</span>
+                    <strong class="line-amount" id="inv-copper-total">486 400 Ar</strong>
+                  </div>
+
+                  <div class="invoice-line">
+                    <span>Isolants & Consommables atelier :</span>
+                    <strong class="line-amount" id="inv-consumables-total">45 000 Ar</strong>
+                  </div>
+
+                  <div class="invoice-line">
+                    <span>Roulements / Fournitures :</span>
+                    <strong class="line-amount" id="inv-bearings-total">60 000 Ar</strong>
+                  </div>
+
+                  <div class="invoice-line">
+                    <span>Main d'œuvre & Essais à vide :</span>
+                    <strong class="line-amount" id="inv-labor-total">250 000 Ar</strong>
+                  </div>
+
+                  <div class="invoice-divider"></div>
+
+                  <div class="invoice-line total-line">
+                    <span>TOTAL FRAIS DE RÉPARATION :</span>
+                    <strong class="total-amount" id="inv-grand-total">841 400 Ar</strong>
+                  </div>
+
+                  <div class="invoice-line advance-line">
+                    <span>Acompte client reçu :</span>
+                    <span id="inv-advance-total">- 150 000 Ar</span>
+                  </div>
+
+                  <div class="invoice-line balance-line">
+                    <span>RESTE À PAYER À LA LIVRAISON :</span>
+                    <strong class="balance-amount" id="inv-balance-due">691 400 Ar</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Liste des sauvegardes d'atelier -->
+          <div class="saved-jobs-section">
+            <h3 class="subsection-title">📁 Historique des Moteurs Réparés à l'Atelier</h3>
+            <div class="saved-jobs-list" id="saved-jobs-list">
+              <!-- Injecté par JS -->
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- ONGLET 3 : MATIÈRES & CONSOMMABLES (BOM)                         -->
+    <!-- ================================================================= -->
+    <section id="tab-matieres" class="tab-panel">
+      <div class="panel-grid-layout">
+        <!-- Calculateur de débit matières -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📦 Calculateur de Matières Premières</h2>
+            <span class="card-hint">Estimations précises pour sortie de stock</span>
+          </div>
+
+          <div class="materials-results-grid">
+            <!-- Cuivre -->
+            <div class="material-card highlight-copper">
+              <div class="mat-icon">🪙</div>
+              <div class="mat-info">
+                <h3>Fil de Cuivre Émaillé (Grade 2 - 200°C)</h3>
+                <div class="mat-value" id="mat-copper-weight">5.12 kg</div>
+                <p class="mat-detail" id="mat-copper-detail">Ø 1.00 mm • Longueur totale : ~728 m (avec 6% marge de frettage)</p>
+              </div>
+            </div>
+
+            <!-- Papier Isolant DMD / Nomex -->
+            <div class="material-card">
+              <div class="mat-icon">📄</div>
+              <div class="mat-info">
+                <h3>Isolants de Fond d'Encoche (Papier DMD / Nomex)</h3>
+                <div class="mat-value" id="mat-insulation-count">36 pièces</div>
+                <p class="mat-detail" id="mat-insulation-size">Dimensions de découpe : <strong>160 mm × 58 mm</strong> (avec rabats 3mm)</p>
+              </div>
+            </div>
+
+            <!-- Cales de Fermeture -->
+            <div class="material-card">
+              <div class="mat-icon">🪵</div>
+              <div class="mat-info">
+                <h3>Cales de Fermeture d'Encoche (Fibre / Verre)</h3>
+                <div class="mat-value" id="mat-wedges-count">36 cales</div>
+                <p class="mat-detail" id="mat-wedges-size">Longueur unitaire : <strong>150 mm</strong> • Profil trapézoïdal</p>
+              </div>
+            </div>
+
+            <!-- Séparateurs de Phase -->
+            <div class="material-card">
+              <div class="mat-icon">⭐</div>
+              <div class="mat-info">
+                <h3>Isolants Inter-Phases (Chignons)</h3>
+                <div class="mat-value" id="mat-phase-separators">12 séparateurs</div>
+                <p class="mat-detail">Feuilles Mylar/DMD en croissant pour isoler les têtes de bobines entre U, V et W</p>
+              </div>
+            </div>
+
+            <!-- Gaines Souplisso -->
+            <div class="material-card">
+              <div class="mat-icon">🧵</div>
+              <div class="mat-info">
+                <h3>Gaine Souplisseau Silicone / Fibre</h3>
+                <div class="mat-value" id="mat-sleeving-len">2.4 mètres</div>
+                <p class="mat-detail">Ø 2.5 mm pour les 6 sorties (U1, V1, W1, U2, V2, W2) + connexions séries internes</p>
+              </div>
+            </div>
+
+            <!-- Consommables de finition -->
+            <div class="material-card">
+              <div class="mat-icon">🪡</div>
+              <div class="mat-info">
+                <h3>Ficelle de Frettage & Vernis</h3>
+                <div class="mat-value" id="mat-twine-varnish">12 m ficelle • 0.8 L vernis</div>
+                <p class="mat-detail">Ficelle polyester/nomex thermo-rétractable + Vernis classe H séchage à l'air/four</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Schéma visuel de découpe du papier isolant -->
+          <div class="cutting-guide-box">
+            <h3 class="guide-title">📐 Gabarit de Découpe de l'Isolant d'Encoche</h3>
+            <div class="cutting-diagram-visual">
+              <svg viewBox="0 0 450 180" width="100%" height="180">
+                <rect x="50" y="30" width="350" height="120" rx="4" fill="rgba(56, 189, 248, 0.08)" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 2"/>
+                <line x1="50" y1="50" x2="400" y2="50" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 3"/>
+                <line x1="50" y1="130" x2="400" y2="130" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 3"/>
+                
+                <!-- Cotes -->
+                <text x="225" y="20" fill="#94A3B8" font-size="12" text-anchor="middle" font-family="JetBrains Mono">Longueur totale = L + 20 mm (Débordements)</text>
+                <text x="225" y="95" fill="#38BDF8" font-size="14" font-weight="bold" text-anchor="middle" font-family="JetBrains Mono" id="svg-cut-length">160 mm</text>
+                
+                <text x="20" y="95" fill="#94A3B8" font-size="12" text-anchor="middle" transform="rotate(-90 20 95)" font-family="JetBrains Mono">Largeur dev.</text>
+                <text x="425" y="95" fill="#F59E0B" font-size="13" font-weight="bold" text-anchor="start" font-family="JetBrains Mono" id="svg-cut-width">58 mm</text>
+                
+                <text x="225" y="45" fill="#F59E0B" font-size="10" text-anchor="middle">Rabat / Ourlet (3 mm)</text>
+                <text x="225" y="145" fill="#F59E0B" font-size="10" text-anchor="middle">Rabat / Ourlet (3 mm)</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculatrice de densité de courant et de foisonnement -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🔍 Vérifications Électromécaniques</h2>
+            <span class="card-hint">Validation technique du bobinage</span>
+          </div>
+
+          <div class="verification-cards">
+            <!-- Taux de foisonnement / remplissage -->
+            <div class="verif-item">
+              <div class="verif-header">
+                <span class="verif-label">Taux de Remplissage de l'Encoche ($K_f$) :</span>
+                <strong class="verif-value" id="verif-filling-rate">68 % (Optimal)</strong>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill fill-good" id="progress-filling" style="width: 68%;"></div>
+              </div>
+              <p class="verif-help">Idéal entre 65% et 75%. En dessous de 60%, sous-exploité ; au-dessus de 80%, insertion très difficile sans blesser l'émail.</p>
+            </div>
+
+            <!-- Densité de courant J -->
+            <div class="verif-item">
+              <div class="verif-header">
+                <span class="verif-label">Densité de Courant ($J$) :</span>
+                <strong class="verif-value" id="verif-current-density">4.71 A/mm²</strong>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill fill-good" id="progress-density" style="width: 58%;"></div>
+              </div>
+              <p class="verif-help">Norme ventilation standard IC411 : 4.0 à 5.5 A/mm² en service continu S1.</p>
+            </div>
+
+            <!-- Section totale de cuivre par encoche -->
+            <div class="verif-item">
+              <div class="verif-header">
+                <span class="verif-label">Section de Cuivre Utile ($S_{Cu}$) :</span>
+                <strong class="verif-value" id="verif-copper-section">25.13 mm² / encoche</strong>
+              </div>
+              <p class="verif-help">32 spires × 0.785 mm² (fil de 1.00 mm).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- ONGLET 4 : ÉQUIVALENCE DE FILS & TABLE COMPLÈTE                  -->
+    <!-- ================================================================= -->
+    <section id="tab-fils" class="tab-panel">
+      <div class="panel-grid-layout">
+        <!-- Calculateur de substitution de fil -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🔄 Dépannage Stock : Équivalence de Fils en Parallèle</h2>
+            <span class="card-hint">Remplacer un fil manquant par plusieurs brins</span>
+          </div>
+
+          <div class="wire-sub-form">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="sub-orig-diam">Diamètre du fil d'origine à remplacer :</label>
+                <div class="input-unit">
+                  <input type="number" id="sub-orig-diam" class="form-input" value="1.20" step="0.01" min="0.1" max="4.0">
+                  <span class="unit-text">mm</span>
+                </div>
+                <small class="form-help">Section originale : <strong id="sub-orig-section">1.131 mm²</strong></small>
+              </div>
+
+              <div class="form-group">
+                <label for="sub-strands-count">Nombre de brins en parallèle désirés :</label>
+                <select id="sub-strands-count" class="form-select">
+                  <option value="2" selected>2 fils en parallèle</option>
+                  <option value="3">3 fils en parallèle</option>
+                  <option value="4">4 fils en parallèle</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sub-suggestions-box">
+              <h4>💡 Meilleures Combinaisons de Fils Standards en Stock :</h4>
+              <div id="sub-results-container" class="sub-results-grid">
+                <!-- Rempli par JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table des fils émaillés -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📖 Table des Fils Émaillés Standards (Cuivre)</h2>
+            <div class="table-search-box">
+              <input type="text" id="wire-table-search" class="form-input form-input-sm" placeholder="🔍 Filtrer diamètre (ex: 0.85 ou 1.2)...">
+            </div>
+          </div>
+
+          <div class="table-scroll-wrapper">
+            <table class="data-table" id="table-enameled-wires">
+              <thead>
+                <tr>
+                  <th>Ø Métrique (mm)</th>
+                  <th>Jauge AWG</th>
+                  <th>Section Cu ($mm^2$)</th>
+                  <th>Résistance ($20^\circ C, \Omega/m$)</th>
+                  <th>Masse ($g/m$)</th>
+                  <th>Courant max ($5 A/mm^2$)</th>
+                </tr>
+              </thead>
+              <tbody id="table-wires-body">
+                <!-- Rempli dynamiquement par JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- ONGLET 5 : ADAPTATION DE TENSION & FRÉQUENCE                     -->
+    <!-- ================================================================= -->
+    <section id="tab-adaptation" class="tab-panel">
+      <div class="panel-grid-layout">
+        <!-- Calculateur Changement de Tension -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">⚡ Rebobinage pour Changement de Tension</h2>
+            <span class="card-hint">Recalcul exact du nombre de spires et de la section</span>
+          </div>
+
+          <div class="adaptation-grid">
+            <div class="form-group">
+              <label for="adapt-v-orig">Tension d'origine ($U_1$) :</label>
+              <div class="input-unit">
+                <input type="number" id="adapt-v-orig" class="form-input" value="220">
+                <span class="unit-text">V</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="adapt-v-target">Nouvelle Tension voulue ($U_2$) :</label>
+              <div class="input-unit">
+                <input type="number" id="adapt-v-target" class="form-input" value="380">
+                <span class="unit-text">V</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="adapt-spires-orig">Spires/encoche d'origine ($N_1$) :</label>
+              <input type="number" id="adapt-spires-orig" class="form-input" value="40">
+            </div>
+            <div class="form-group">
+              <label for="adapt-diam-orig">Diamètre fil d'origine ($\varnothing_1$) :</label>
+              <div class="input-unit">
+                <input type="number" id="adapt-diam-orig" class="form-input" value="0.95" step="0.01">
+                <span class="unit-text">mm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Résultat Recalculé -->
+          <div class="adaptation-result-card">
+            <h3>🎯 Nouveau Bobinage Recommandé pour <span id="adapt-res-volt">380 V</span> :</h3>
+            <div class="adapt-result-stats">
+              <div class="stat-pill">
+                <span class="pill-label">Nouvelles spires / encoche ($N_2$) :</span>
+                <strong class="pill-value" id="adapt-res-spires">69 spires</strong>
+                <small class="pill-formula">$N_2 = N_1 \times (U_2 / U_1)$</small>
+              </div>
+              <div class="stat-pill">
+                <span class="pill-label">Nouveau diamètre fil ($\varnothing_2$) :</span>
+                <strong class="pill-value" id="adapt-res-diam">0.72 mm</strong>
+                <small class="pill-formula">$\varnothing_2 = \varnothing_1 \times \sqrt{U_1 / U_2}$</small>
+              </div>
+              <div class="stat-pill">
+                <span class="pill-label">Fil standard le plus proche :</span>
+                <strong class="pill-value" id="adapt-res-standard">Ø 0.71 mm ou Ø 0.75 mm</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Changement de Fréquence 50Hz <-> 60Hz -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🌐 Passage 50 Hz $\leftrightarrow$ 60 Hz</h2>
+            <span class="card-hint">Comportement magnétique et vitesse</span>
+          </div>
+
+          <div class="freq-box">
+            <p>Lorsqu'un moteur 50 Hz est utilisé sur un réseau 60 Hz (ou inversement) :</p>
+            <ul class="bullet-list">
+              <li><strong>Vitesse de rotation :</strong> Augmente de 20% en 60 Hz ($N_{60} = 1.2 \times N_{50}$).</li>
+              <li><strong>Rapport $V/f$ constant :</strong> Pour garder le même flux magnétique, la tension doit augmenter proportionnellement ($400\text{V} @ 50\text{Hz} \to 480\text{V} @ 60\text{Hz}$).</li>
+              <li><strong>Rebobinage spécifique :</strong> Si la tension reste identique ($400\text{V}$), le nombre de spires doit être réduit de $17\%$ : $N_{60} = N_{50} \times (50/60) = 0.833 \times N_{50}$.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- ONGLET 6 : TRANSFORMATEURS (MONOPHASE / TRIPHASE)                 -->
+    <!-- ================================================================= -->
+    <section id="tab-transfo" class="tab-panel">
+      <div class="panel-grid-layout">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🔌 Dimensionnement de Transformateur</h2>
+            <span class="card-hint">Calcul du noyau de fer, spires par volt et jauges</span>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label for="tr-power">Puissance Apparente ($S$) :</label>
+              <div class="input-unit">
+                <input type="number" id="tr-power" class="form-input" value="500" step="10">
+                <span class="unit-text">VA</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tr-freq">Fréquence ($f$) :</label>
+              <div class="input-unit">
+                <input type="number" id="tr-freq" class="form-input" value="50">
+                <span class="unit-text">Hz</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tr-b-max">Induction magnétique ($B_{max}$) :</label>
+              <div class="input-unit">
+                <input type="number" id="tr-b-max" class="form-input" value="1.2" step="0.1">
+                <span class="unit-text">Tesla</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row-2" style="margin-top: 1rem;">
+            <div class="form-group">
+              <label for="tr-u-prim">Tension Primaire ($U_1$) :</label>
+              <div class="input-unit">
+                <input type="number" id="tr-u-prim" class="form-input" value="230">
+                <span class="unit-text">V</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tr-u-sec">Tension Secondaire ($U_2$) :</label>
+              <div class="input-unit">
+                <input type="number" id="tr-u-sec" class="form-input" value="24">
+                <span class="unit-text">V</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Résultats transformateur -->
+          <div class="transfo-results-grid" style="margin-top: 1.5rem;">
+            <div class="stat-pill">
+              <span class="pill-label">Section minimale du noyau ($S_{fer}$) :</span>
+              <strong class="pill-value" id="tr-res-sfer">25.7 cm²</strong>
+              <small class="pill-formula">$S_{fer} = 1.15 \times \sqrt{S}$</small>
+            </div>
+            <div class="stat-pill">
+              <span class="pill-label">Spires par Volt ($n$) :</span>
+              <strong class="pill-value" id="tr-res-spv">1.46 spires / V</strong>
+            </div>
+            <div class="stat-pill">
+              <span class="pill-label">Primaire ($N_1$ & Ø fil) :</span>
+              <strong class="pill-value" id="tr-res-prim">336 spires • Ø 0.85 mm</strong>
+            </div>
+            <div class="stat-pill">
+              <span class="pill-label">Secondaire ($N_2$ & Ø fil) :</span>
+              <strong class="pill-value" id="tr-res-sec">37 spires • Ø 2.50 mm</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modale d'impression A4 masquée à l'écran, active en @media print -->
+  <div id="print-sheet-wrapper" class="print-only">
+    <!-- Structure imprimable synchronisée dynamiquement -->
+  </div>
+
+  <footer class="app-footer">
+    <p><strong id="footer-workshop-name">Atelier de Bobinage</strong> • Madagascar • Devis &amp; Tarifs exprimés en <strong>Ariary (MGA)</strong></p>
+    <p style="font-size:0.78rem; margin-top:0.3rem; opacity:0.7;">
+      © 2026 <strong>BobinagePro™</strong> — Conçu par <strong>BOTRATOMBO Christin</strong> — Tous droits réservés.<br>
+      Logiciel protégé. Toute reproduction, distribution ou modification non autorisée est interdite.
+    </p>
+  </footer>
+
+  <script src="security.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
